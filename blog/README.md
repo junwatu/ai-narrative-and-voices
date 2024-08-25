@@ -1,5 +1,7 @@
 # Leveraging AI to Generate Narrative Voices and Titles for Documentary Videos
 
+![image cover](images/ai-narrative-cover.jpg)
+
 ## **Introduction**
 
 - Briefly introduce the growing role of AI in content creation, specifically for documentaries.

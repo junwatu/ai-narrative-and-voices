@@ -1,5 +1,5 @@
 import express from 'express'
-import { generateNarrative, generateTitle } from '../services/openAIService'
+import { generateNarrative, generateTitle } from '../services/openAIService.js'
 
 const router = express.Router()
 

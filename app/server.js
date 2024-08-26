@@ -1,8 +1,8 @@
 import path from 'path'
 import express from 'express'
 import bodyParser from 'body-parser'
-import generateRoutes from './routes/generateRoutes'
-import metadataRoutes from './routes/metadataRoutes'
+import generateRoutes from './routes/generateRoutes.js'
+import metadataRoutes from './routes/metadataRoutes.js'
 import { __dirname } from './dirname.js'
 
 const app = express()
@@ -21,6 +21,9 @@ app.use(bodyParser.json({ limit: '10mb' }))
 app.use(express.static(path.join(__dirname, 'dist')))
 app.use(express.static(path.join(__dirname, 'public')))
 
+app.use('/', (req, res) => {
+	res.json({ app: 'video narrative generator' })
+})
 // Routes
 app.use('/api/generate', generateRoutes)
 app.use('/api/metadata', metadataRoutes)

@@ -2,7 +2,7 @@ import express from 'express'
 import {
 	getDocumentaryMetadata,
 	saveDocumentaryMetadata,
-} from '../services/gridDBService'
+} from '../services/gridDBService.js'
 
 const router = express.Router()
 

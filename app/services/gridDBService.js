@@ -14,7 +14,7 @@ const store = factory.getStore({
 */
 
 async function getDocumentaryMetadata(docId) {
-	/**
+    /**
 		const container = await store.getContainer("documentary_metadata");
 		const query = container.query(`SELECT * WHERE id = '${docId}'`);
 		const rs = await query.fetch();
@@ -23,18 +23,15 @@ async function getDocumentaryMetadata(docId) {
 		}
 	
 	**/
-	return null;
+	return null
 }
 
 async function saveDocumentaryMetadata(metadata) {
-	/**
+    /**
 	const container = await store.getContainer("documentary_metadata");
 	await container.put(metadata);
 	*/
 	return null
 }
 
-export {
-	getDocumentaryMetadata,
-	saveDocumentaryMetadata,
-};
+export { getDocumentaryMetadata, saveDocumentaryMetadata }

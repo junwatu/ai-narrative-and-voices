@@ -1,8 +1,8 @@
-import OpenAI from "openai";
+import OpenAI from 'openai'
 
 const openai = new OpenAI({
 	apiKey: process.env.OPENAI_API_KEY,
-});
+})
 
 async function generateNarrative(prompt) {
 	//code here
@@ -11,10 +11,7 @@ async function generateNarrative(prompt) {
 
 async function generateTitle(prompt) {
 	// code here
-	return prompt;
+	return prompt
 }
 
-export {
-	generateNarrative,
-	generateTitle,
-}
+export { generateNarrative, generateTitle }

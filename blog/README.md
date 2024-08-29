@@ -8,8 +8,6 @@ This blog focuses on leveraging AI to generate narrative voices and titles for d
 
 ## Run The Application
 
-
-### Clone the repository
 Clone the repository from this [link](https://github.com/junwatu/ai-narrative-and-voices) or run the following commands:
 
 ```bash
@@ -19,7 +17,7 @@ cd app
 npm install
 ```
 
-### Run the application
+Copy the `.env.example` file to `.env` and set the `VITE_APP_URL` environment variable or leave it by default and set the `OPENAI_API_KEY` environment variable (please look at this section for more details on how to [get the OpenAI API key](#)).
 
 To run the application, execute the following command:
 
@@ -32,8 +30,19 @@ Open the browser and navigate to `http://localhost:3000/`.
 
 ## **Problem Statement**
 
-- Challenges faced in manually generating compelling narratives and titles.
-- Time constraints and creative block issues in traditional methods.
+Creating compelling narratives and attention-grabbing titles for documentary videos presents significant challenges due to:
+
+- **Time-Consuming Process**: Manually crafting narratives and titles is lengthy and often leads to delays, particularly under tight production schedules.
+- **Creative Blocks**: Writers frequently face creative blocks, hindering the consistent generation of fresh, engaging content.
+- **Scalability Issues**: As content volume grows, maintaining consistent quality across multiple projects becomes increasingly difficult.
+
+### **Why AI is the Best Solution**
+
+AI effectively addresses these challenges by:
+
+- **Enhancing Efficiency**: AI, with the right prompt, rapidly generates high-quality narratives and titles, significantly reducing production time.
+- **Ensuring Consistent Creativity**: AI models, such as those from OpenAI, produce a continuous flow of creative content, overcoming human limitations like writer’s block.
+- **Scaling Seamlessly**: AI easily scales to manage large volumes of content while maintaining consistent quality across all outputs.
 
 ## **Tech Stack Overview**
 

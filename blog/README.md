@@ -4,13 +4,31 @@
 
 ## **Introduction**
 
-- Briefly introduce the growing role of AI in content creation, specifically for documentaries.
-- Explain the focus of the blog: generating narrative voices and titles using AI.
-- Mention the tech stack: Node.js, GridDB, OpenAI, and React.
+This blog focuses on leveraging AI to generate narrative voices and titles for documentary videos. We’ll explore how to implement this using a tech stack that includes Node.js for backend operations, GridDB for managing video metadata, OpenAI for AI-driven text and voice generation, and React for building an interactive frontend.
 
 ## Run The Application
 
-Brief instruction to get the application code run.
+
+### Clone the repository
+Clone the repository from this [link](https://github.com/junwatu/ai-narrative-and-voices) or run the following commands:
+
+```bash
+git clone https://github.com/junwatu/ai-narrative-and-voices.git
+cd ai-narrative-and-voices
+cd app
+npm install
+```
+
+### Run the application
+
+To run the application, execute the following command:
+
+```bash
+npm run start:build
+```
+Open the browser and navigate to `http://localhost:3000/`. 
+
+> You can also customize the app address and port by setting the `VITE_SITE_URL` environment variable in the `.env` file.
 
 ## **Problem Statement**
 

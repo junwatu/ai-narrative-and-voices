@@ -46,10 +46,71 @@ AI effectively addresses these challenges by:
 
 ## **Tech Stack Overview**
 
-- **Node.js**: Backend framework for handling API requests and server-side operations.
-- **GridDB**: A NoSQL time-series database to manage video metadata and context data.
-- **OpenAI**: The core AI for generating narrative text and title ideas.
-- **React**: Frontend UI for interacting with the AI and managing the output.
+### OpenAI Key
+
+To access any OpenAI services, we need a valid key. Go to this [link](https://platform.openai.com/api-keys) and create a new OpenAI key.
+
+![setup key](images/openai-key.png)
+
+The OpenAI key is on a project basis, so we need to create a project first in the OpenAI platform and you need also to enable any models that you use on a project. For this project, we will need `gpt-4o` and `whisper` models.
+
+![enabled models](images/openai-enabled-models.png)
+
+The OpenAI key will be saved on the `.env` file and make sure not to include it in version control by adding it to the `.gitignore`.
+
+### Node.js
+
+This project will run on the Node.js platform. You need to install it from [here](https://nodejs.org/en/download). For this project, we will use the `nvm` package manager and Node.js v16.20.2
+LTS version.
+
+```shell
+# installs nvm (Node Version Manager)
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+
+# download and install Node.js
+nvm install 16
+
+# verifies the right Node.js version is in the environment
+node -v # should print `v16.20.2`
+
+# verifies the right NPM version is in the environment
+npm -v # should print `8.19.4``
+```
+
+To connect Node.js and GridDB database, you need the [gridb-node-api](https://github.com/nodejs/node-addon-api) npm package which is a Node.js binding developed using GridDB C Client and Node addon API.
+
+### FFmpeg
+
+This project utilizes the [`fluent-ffmpeg`](https://www.npmjs.com/package/fluent-ffmpeg) npm package, which requires FFmpeg to be installed on the system. For Ubuntu, you can use the following command to install it:
+
+```shell
+sudo apt update
+sudo apt install ffmpeg
+```
+
+For more installation information, please go to the [FFmpeg official website](https://ffmpeg.org/).
+
+### GridDB
+
+To save the video summary and video data, we will use the GridDB database. Please look at the [guide](https://docs.griddb.net/latest/gettingstarted/using-apt/#install-with-apt-get) for detailed installation. We will use Ubuntu 20.04 LTS here.
+
+Run GridDB and check if the service is running. Use this command:
+
+```shell
+sudo systemctl status gridstore
+```
+
+If not running try to run the database with this command:
+
+```shell
+sudo systemctl start gridstore
+```
+ 
+### React
+
+We will use [React](https://react.dev/) to build the frontend of the application. React lets you build user interfaces out of individual pieces called components. So if you want to expand or modify the application, you can easily do so by adding or modifying components.
+
+
 
 ## **System Architecture**
 

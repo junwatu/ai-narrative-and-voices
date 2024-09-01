@@ -28,7 +28,7 @@ Open the browser and navigate to `http://localhost:3000/`.
 
 > You can also customize the app address and port by setting the `VITE_SITE_URL` environment variable in the `.env` file.
 
-## **Problem Statement**
+## **Solving the Problem**
 
 Creating compelling narratives and attention-grabbing titles for documentary videos presents significant challenges due to:
 
@@ -121,17 +121,19 @@ We will use [React](https://react.dev/) to build the frontend of the application
 5. **Metadata Storage:** Node.js stores the video metadata and AI-generated content in GridDB.
 6. **Frontend Interaction:** Node.js sends the necessary data to the React frontend for user interaction and display.
 
-## **Implementation**
+## **Node.js Server**
 
-- **Setting Up Node.js with GridDB**: Step-by-step guide on connecting Node.js to GridDB for storing and retrieving relevant data.
-- **Integrating OpenAI for Text Generation**: API integration for generating narrative text and titles.
-- **Building the React Frontend**: Creating a UI for users to input prompts, view AI suggestions, and manage generated content.
+[DRAFT]
+
+### Routes
+
+### Frame Extraction
+
+### Connect to GridDB
 
 ## **AI Content Generation Workflow**
 
-### **Storing Video Metadata in GridDB**
-
-How metadata like themes, topics, and timestamps help refine AI output.
+[DRAFT]
 
 ### **Generating Narrative Voices**
 
@@ -141,7 +143,18 @@ Fine-tuning OpenAI’s models to produce engaging and relevant narrative content
 
 Using AI to generate impactful and attention-grabbing titles based on the video’s content.
 
+### **Storing Video Metadata in GridDB**
+
+How metadata like themes, topics, and timestamps help refine AI output.
+
+## User Interface
+
+[DRAFT]
+
+## Demo
+
+[DRAFT] 
+
 ## **Repository Link**
 
-- Provide sample code snippets for critical parts (API integration, GridDB setup).
-- Link to the full repository (if applicable) for readers to explore and try it out themselves.
+[Github project source code](https://github.com/junwatu/ai-narrative-and-voices/tree/main/app)

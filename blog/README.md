@@ -110,12 +110,16 @@ sudo systemctl start gridstore
 
 We will use [React](https://react.dev/) to build the frontend of the application. React lets you build user interfaces out of individual pieces called components. So if you want to expand or modify the application, you can easily do so by adding or modifying components.
 
-
-
 ## **System Architecture**
 
-- **Data Flow Diagram**: Outline the interaction between each component (OpenAI API, GridDB, Node.js backend, and React frontend).
-- **Component Breakdown**: Explain how each technology contributes to the solution.
+![system architecture](images/system-arch.png)
+
+1. **Video Upload:** The browser uploads the video to the Node.js backend for processing.
+2. **Video Processing:** Node.js sends the video to FFmpeg for processing tasks like encoding, decoding, or frame extraction.
+3. **Processed Video Retrieval:** FFmpeg processes the video and returns the processed data to Node.js.
+4. **AI Content Generation:** Node.js sends the processed video data to OpenAI for generating narrative voices and titles.
+5. **Metadata Storage:** Node.js stores the video metadata and AI-generated content in GridDB.
+6. **Frontend Interaction:** Node.js sends the necessary data to the React frontend for user interaction and display.
 
 ## **Implementation**
 

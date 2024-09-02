@@ -135,13 +135,14 @@ We will use [React](https://react.dev/) to build the frontend of the application
 
 [DRAFT]
 
+
+### **Creating Narrative Descriptions**
+
+Using OpenAI’s `gpt-4o` model to generate impactful and attention-grabbing description and title based on the video’s content.
+
 ### **Generating Narrative Voices**
 
-Fine-tuning OpenAI’s models to produce engaging and relevant narrative content.
-
-### **Creating Titles**
-
-Using AI to generate impactful and attention-grabbing titles based on the video’s content.
+Using OpenAI’s `whisper` model to produce engaging and relevant narrative content.
 
 ### **Storing Video Metadata in GridDB**
 
@@ -157,4 +158,4 @@ How metadata like themes, topics, and timestamps help refine AI output.
 
 ## **Repository Link**
 
-[Github project source code](https://github.com/junwatu/ai-narrative-and-voices/tree/main/app)
+[Github project source code](https://github.com/junwatu/ai-narrative-and-voices/tree`/main/app)

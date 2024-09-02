@@ -6,6 +6,8 @@ import bodyParser from 'body-parser'
 import generateRoutes from './routes/generateRoutes.js'
 import metadataRoutes from './routes/metadataRoutes.js'
 import { __dirname } from './dirname.js'
+import { processVideo } from './libs/videoprocessor.js'
+
 
 const app = express()
 
@@ -21,6 +23,7 @@ const PORT = apiURL.port || 3000
 app.use(bodyParser.json({ limit: '10mb' }))
 app.use(express.static(path.join(__dirname, 'dist')))
 app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.static(path.join(__dirname, 'frames')))
 
 // Configure multer for file upload
 const storage = multer.diskStorage({
@@ -39,11 +42,36 @@ const storage = multer.diskStorage({
 const upload = multer({ storage })
 
 // Routes
-app.post('/api/upload', upload.single('file'), (req, res) => {
+app.post('/api/upload', upload.single('file'), async (req, res) => {
     if (!req.file) {
-        return res.status(400).send('No file uploaded.')
-    }
-    res.send('File uploaded successfully')
+		return res.status(400).send('No file uploaded')
+	}
+	try {
+		const videoPath = path.join(__dirname, 'uploads', req.file.filename)
+		const { base64Frames, audioFilename } = await processVideo(videoPath)
+		//const audioToTextResponse = await transcribeAudio(path.join(outputAudioFolder, audioFilename))
+		//const videoSummary = await createVideoSummarization(base64Frames, audioToTextResponse)
+
+		const summaryData = {
+			filename: videoPath,
+			audioTranscription: audioToTextResponse,
+			summary: videoSummary
+		}
+
+		//const saveResponse = await saveData(summaryData)
+		//console.log(saveResponse)
+
+		res.json({
+			message: `File uploaded and processed: ${req.file.filename}`,
+			frames: base64Frames,
+			audio: audioFilename,
+			audioTranscription: audioToTextResponse,
+			videoSummary: videoSummary
+		})
+	} catch (error) {
+		console.error('Error processing video:', error)
+		res.status(500).send('Error processing video')
+	}
 })
 
 app.use('/api/generate', generateRoutes)

@@ -39,7 +39,6 @@ router.post('/upload', upload.single('file'), async (req, res) => {
         res.json({
             message: `File uploaded and processed: ${req.file.filename}`,
             frames: base64Frames,
-            audio: audioFilename,
             filename: videoPath
         })
     } catch (error) {

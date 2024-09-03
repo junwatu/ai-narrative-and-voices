@@ -30,11 +30,9 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     }
     try {
         const videoPath = path.join(__dirname, 'uploads', req.file.filename)
-        const { base64Frames, audioFilename } = await processVideo(videoPath)
+        const { base64Frames } = await processVideo(videoPath)
 
-        // Assuming the transcribeAudio and createVideoSummarization functions are available
-        // const audioToTextResponse = await transcribeAudio(path.join(outputAudioFolder, audioFilename))
-        // const videoSummary = await createVideoSummarization(base64Frames, audioToTextResponse)
+        // send frames to OpenAI
 
         res.json({
             message: `File uploaded and processed: ${req.file.filename}`,

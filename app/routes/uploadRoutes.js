@@ -36,18 +36,11 @@ router.post('/upload', upload.single('file'), async (req, res) => {
         // const audioToTextResponse = await transcribeAudio(path.join(outputAudioFolder, audioFilename))
         // const videoSummary = await createVideoSummarization(base64Frames, audioToTextResponse)
 
-        const summaryData = {
-            filename: videoPath,
-            audioTranscription: audioToTextResponse,
-            summary: videoSummary
-        }
-
         res.json({
             message: `File uploaded and processed: ${req.file.filename}`,
             frames: base64Frames,
             audio: audioFilename,
-            audioTranscription: audioToTextResponse,
-            videoSummary: videoSummary
+            filename: videoPath
         })
     } catch (error) {
         console.error('Error processing video:', error)

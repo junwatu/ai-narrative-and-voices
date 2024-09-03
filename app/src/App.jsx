@@ -1,12 +1,13 @@
-import './App.css'
+import React from 'react'
+import FileUpload from './components/FileUpload'
 
 function App() {
-  
-  return (
-    <>
-      <h1>Video Narrator</h1>   
-    </>
-  )
+	return (
+		<div className="App">
+			<h1>Upload File to Server</h1>
+			<FileUpload />
+		</div>
+	)
 }
 
 export default App

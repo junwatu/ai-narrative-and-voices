@@ -86,6 +86,19 @@ export function imageToBase64(imagePath) {
 	})
 }
 
+async function getVideoDuration(filePath) {
+	return new Promise((resolve, reject) => {
+	  ffmpeg.ffprobe(filePath, (err, metadata) => {
+		if (err) {
+		  reject(err)
+		} else {
+		  const duration = metadata.format.duration
+		  resolve(duration)
+		}
+	  })
+	})
+  }
+
 export function extractAudio(videoPath, audioPath) {
 	return new Promise((resolve, reject) => {
 		ffmpeg(videoPath)
@@ -112,6 +125,8 @@ export async function processVideo(videoPath, secondsPerFrame = 4) {
 	// Clean the frames folder before extracting new frames
 	await cleanFramesFolder(outputFolder)
 
+	const duration = await getVideoDuration(videoPath)
+
 	// Extract frames from the video
 	const framePaths = await extractFrames(videoPath, secondsPerFrame, outputFolder)
 
@@ -127,5 +142,5 @@ export async function processVideo(videoPath, secondsPerFrame = 4) {
 
 	console.log(`Extracted ${base64Frames.length} frames`)
 	console.log(`Extracted audio to ${audioPath}`)
-	return { base64Frames, audioFilename }
+	return { base64Frames, audioFilename, duration }
 }

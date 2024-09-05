@@ -10,6 +10,8 @@ async function generateTitle(prompt) {
 }
 
 async function generateNarrative(frames, audioTranscription) {
+	const videoDuration = 2
+	
 	const frameObjects = frames.map(x => ({
 		type: 'image_url',
 		image_url: {
@@ -21,7 +23,7 @@ async function generateNarrative(frames, audioTranscription) {
 	const videoContent = {
 		role: "user",
 		content: [
-			{ type: 'text', text: "These are the frames from the video." },
+			{ type: 'text', text: `The original video, in which frames are generated  is ${videoDuration} seconds. Create a story based on these frames. BE CREATIVE. DIRECT ANSWER ONLY.` },
 			...frameObjects
 		],
 	}
@@ -31,7 +33,7 @@ async function generateNarrative(frames, audioTranscription) {
 		messages: [
 			{
 				role: "system",
-				content: "You are a professional video narrative generator. Please provide a narrative for the video based on the frames."
+				content: "You are a professional storyteller."
 			},
 			videoContent
 		],

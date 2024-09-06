@@ -69,7 +69,6 @@ async function generateNarrative(frames) {
 		},
 	});
 
-	console.log(response)
 	const narrativeResponse = response.choices[0].message.content
 	return narrativeResponse;
 }

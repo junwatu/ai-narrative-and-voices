@@ -123,13 +123,176 @@ We will use [React](https://react.dev/) to build the frontend of the application
 
 ## **Node.js Server**
 
-[DRAFT]
+Node.js server is the core of the application. It is responsible for the following tasks:
 
-### Routes
+- Handle the video upload
+- Frame extraction
+- AI content generation
+- Connect to GridDB
+- Routes
+
+### Video Upload
+
+The `api/upload` route handles the video upload and saves the video the `uploads` folder.
+
+```js
+app.use('/api', uploadRoutes)  // Add the upload routes
+```
+
+The `uploadRoutes` is defined in the `routes/uploadRoutes.js` file.
+
+```js
+router.post('/upload', upload.single('file'), async (req, res) => {
+	if (!req.file) {
+		return res.status(400).send('No file uploaded or invalid file type.')
+	}
+	try {
+		const videoPath = path.join(__dirname, 'uploads', req.file.filename)
+		const { base64Frames } = await processVideo(videoPath)
+
+		// send frames to OpenAI
+
+		res.json({
+			message: `File uploaded and processed: ${req.file.filename}`,
+			frames: base64Frames,
+			filename: videoPath
+		})
+	} catch (error) {
+		console.error('Error processing video:', error)
+		res.status(500).send('Error processing video')
+	}
+})
+```
+This route is used to process the video and extract the frames and will returns the base64 frames of the video and later will be sent to OpenAI for generating the narrative voices and titles.
 
 ### Frame Extraction
 
+The `processVideo` function is defined in the `libs/videoprocessor.js` file. This function uses the `ffmpeg` package to extract the frames from the video.
+
+```js
+export function extractFrames(videoPath, secondsPerFrame, outputFolder, scaleFactor = 0.5) {
+	return new Promise((resolve, reject) => {
+		const frameRate = 1 / secondsPerFrame
+		const framePattern = path.join(outputFolder, 'frame-%03d.png')
+		const resizeOptions = `fps=${frameRate},scale=iw*${scaleFactor}:ih*${scaleFactor}`
+
+		ffmpeg(videoPath)
+			.outputOptions([`-vf ${resizeOptions}`])
+			.output(framePattern)
+			.on('end', () => {
+				fs.readdir(outputFolder, (err, files) => {
+					if (err) {
+						reject(err)
+					} else {
+						const framePaths = files.map(file => path.join(outputFolder, file))
+						resolve(framePaths)
+					}
+				})
+			})
+			.on('error', reject)
+			.run()
+	})
+}
+```
+
+The default seconds per frame is 4 seconds. You can override this by passing the `secondsPerFrame` parameter to the `extractFrames` function. The frames will be saved in the `frames` folder.
+
+### AI Content Generation
+
+The routes `/api/generate/narrative` and `/api/generate/title` are used to generate the narrative and title of the video. The `generateNarrative` and `generateTitle` functions are responsible for generating the narrative and title of the video. These functions are defined in the `services/openAIService.js` file.
+
+#### Generate Narrative
+
+The `generateNarrative` function is used to generate the narrative of the video. It takes the base64 frames of the video as input and returns the narrative of the video.
+
+```js
+async function generateNarrative(frames, videoDuration = 2) {
+) {
+	const frameObjects = frames.map(x => ({
+		type: 'image_url',
+		image_url: {
+			url: `data:image/png;base64,${x}`,
+			detail: "low"
+		}
+	}));
+
+	const videoContent = {
+		role: "user",
+		content: [
+			{ type: 'text', text: `The original video, in which frames are generated  is ${videoDuration} seconds. Create a story based on these frames. BE CREATIVE. DIRECT ANSWER ONLY.` },
+			...frameObjects
+		],
+	}
+
+	const response = await openai.chat.completions.create({
+		model: "gpt-4o",
+		messages: [
+			{
+				role: "system",
+				content: "You are a professional storyteller."
+			},
+			videoContent
+		],
+		temperature: 1,
+		max_tokens: 4095,
+		top_p: 1,
+		frequency_penalty: 0,
+		presence_penalty: 0,
+		response_format: {
+		  "type": "text"
+		},
+	});
+
+	const narrativeResponse = response.choices[0].message.content
+	return narrativeResponse;
+}
+```
+
+To generate the narrative text, we use prompt engineering to guide the AI model. The prompt is a text that includes the video frames and the video duration:
+
+```text
+The original video, in which frames are generated  is ${videoDuration} seconds. Create a story based on these frames. BE CREATIVE. DIRECT ANSWER ONLY.
+```
+
+#### Generate Title
+
+The `generateTitle` function is used to generate the title of the video. It takes the narrative text as input and returns the title.
+
+```js
+async function generateTitle(narrative) {
+	const titleResponse = await openai.chat.completions.create({
+		model: 'gpt-4o-mini',
+		messages: [
+			{
+				role: 'system',
+				content: 'You are a professional storyteller.'
+			},
+			{
+				role: 'user',
+				content: `Direct answer only. Generate a title for the following narrative text: \n${narrative}`
+			}
+		],
+		temperature: 1,
+		max_tokens: 1000,
+		top_p: 1,
+		frequency_penalty: 0,
+		presence_penalty: 0,
+		response_format: {
+			type: 'text'
+		}
+	})
+
+	const title = titleResponse.choices[0].message.content
+	return title
+}
+```
+
+
+
 ### Connect to GridDB
+
+### Routes
+
 
 ## **AI Content Generation Workflow**
 

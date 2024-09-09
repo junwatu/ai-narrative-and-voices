@@ -1,4 +1,5 @@
 import OpenAI from 'openai'
+import fs from 'fs'
 
 const openai = new OpenAI({
 	apiKey: process.env.OPENAI_API_KEY,
@@ -69,12 +70,50 @@ async function generateNarrative(frames) {
 		},
 	});
 
-	const narrativeResponse = response.choices[0].message.content
-	return narrativeResponse;
+	if (response.choices[0].finish_reason === 'stop') {
+		const narrative = response.choices[0].message.content
+		const title = await generateTitle(narrative)
+		
+		const fileName = title.split(' ').join('-').toLowerCase()
+		const voice = await generateSpeechToFile(narrative, 'audio', fileName)
+
+		return { narrative, title, voice }
+	}
+	else {
+		throw new Error('Failed to generate narrative')
+	}
 }
 
-async function generateVoice(narrative) {
-	return narrative
+/**
+ * Generate speech from text and save it to an MP3 file inside a specified folder
+ * @param {string} text - The input text to convert into speech
+ * @param {string} folderPath - The folder path where the MP3 will be saved
+ * @param {string} fileName - The name of the MP3 file (without extension)
+ * @param {string} [model="tts-1"] - The model to use for text-to-speech
+ * @param {string} [voice="alloy"] - The voice to use for text-to-speech
+ * @returns {Promise<string>} - Returns the file path where the MP3 was saved
+ */
+async function generateSpeechToFile(text, folderPath, fileName, model = 'tts-1', voice = 'shimmer') {
+	try {
+		if (!fs.existsSync(folderPath)) {
+			await fs.promises.mkdir(folderPath, { recursive: true });
+		}
+
+		const outputFilePath = path.join(folderPath, `${fileName}.mp3`);
+		const mp3 = await openai.audio.speech.create({
+			model,
+			voice,
+			input: text,
+		});
+
+		const buffer = Buffer.from(await mp3.arrayBuffer());
+		await fs.promises.writeFile(outputFilePath, buffer);
+		console.log(`File saved at: ${outputFilePath}`);
+		return outputFilePath;
+	} catch (error) {
+		console.error('Error generating speech:', error);
+		throw error;
+	}
 }
 
-export { generateNarrative, generateTitle, generateVoice }
+export { generateNarrative, generateTitle, generateSpeechToFile as generateVoice }

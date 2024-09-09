@@ -2,12 +2,14 @@ import express from 'express'
 import path from 'path'
 import multer from 'multer'
 import fs from 'fs'
-import { processVideo } from '../libs/videoprocessor.js'
+
 import { __dirname } from '../dirname.js'
+import { processVideo } from '../libs/videoprocessor.js'
+import { generateNarrative } from '../services/openAIService.js'
+
 
 const router = express.Router()
 
-// Configure multer for file upload
 const storage = multer.diskStorage({
 	destination: (req, file, cb) => {
 		const uploadDir = path.join(__dirname, 'uploads')
@@ -47,11 +49,14 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 		const { base64Frames } = await processVideo(videoPath)
 
 		// send frames to OpenAI
+		const { narrative, title, voice } = await generateNarrative(base64Frames)
 
 		res.json({
 			message: `File uploaded and processed: ${req.file.filename}`,
-			frames: base64Frames,
-			filename: videoPath
+			filename: videoPath,
+			narrative,
+			title,
+			voice
 		})
 	} catch (error) {
 		console.error('Error processing video:', error)

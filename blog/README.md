@@ -36,13 +36,6 @@ Creating compelling narratives and attention-grabbing titles for documentary vid
 - **Creative Blocks**: Writers frequently face creative blocks, hindering the consistent generation of fresh, engaging content.
 - **Scalability Issues**: As content volume grows, maintaining consistent quality across multiple projects becomes increasingly difficult.
 
-### **Why AI is the Best Solution**
-
-AI effectively addresses these challenges by:
-
-- **Enhancing Efficiency**: AI, with the right prompt, rapidly generates high-quality narratives and titles, significantly reducing production time.
-- **Ensuring Consistent Creativity**: AI models, such as those from OpenAI, produce a continuous flow of creative content, overcoming human limitations like writer’s block.
-- **Scaling Seamlessly**: AI easily scales to manage large volumes of content while maintaining consistent quality across all outputs.
 
 ## **Tech Stack Overview**
 
@@ -52,7 +45,7 @@ To access any OpenAI services, we need a valid key. Go to this [link](https://pl
 
 ![setup key](images/openai-key.png)
 
-The OpenAI key is on a project basis, so we need to create a project first in the OpenAI platform and you need also to enable any models that you use on a project. For this project, we will need `gpt-4o` and `whisper` models.
+The OpenAI key is on a project basis, so we need to create a project first in the OpenAI platform and you need also to enable any models that you use on a project. For this project, we will need `gpt-4o`, `gpt-4o-mini` and `tts-1` models.
 
 ![enabled models](images/openai-enabled-models.png)
 
@@ -287,7 +280,7 @@ async function generateTitle(narrative) {
 }
 ```
 
-
+The model used here is `gpt-4o-mini` which is a smaller version of `gpt-4o` model.
 
 ### Connect to GridDB
 

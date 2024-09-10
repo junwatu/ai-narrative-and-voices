@@ -1,7 +1,7 @@
 import express from 'express'
 import path from 'path'
 import bodyParser from 'body-parser'
-import metadataRoutes from './routes/metadataRoutes.js'
+//import metadataRoutes from './routes/metadataRoutes.js'
 import uploadRoutes from './routes/uploadRoutes.js'
 import { __dirname } from './dirname.js'
 
@@ -20,7 +20,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.static(path.join(__dirname, 'frames')))
 
 app.use('/api', uploadRoutes)
-app.use('/api/metadata', metadataRoutes)
+//app.use('/api/metadata', metadataRoutes)
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'))

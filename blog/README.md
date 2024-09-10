@@ -329,14 +329,34 @@ async function generateSpeechToFile(text, folderPath, fileName, model = 'tts-1',
 
 The generated audio will be saved as an MP3 file in the specified folder. This audio file can be combined with the original video footage to create a compelling documentary-style video.
 
-### Connect to GridDB
+### Storing Video Metadata in GridDB
 
-### **Storing Video Metadata in GridDB**
+The GridDB database will store **the video file path**, **audio voice filename**, **generated narrative**, and **title**. This ensures efficient retrieval and management of all essential documentary metadata.
 
-How metadata like themes, topics, and timestamps help refine AI output.
+After uploading and processing video by OpenAI. The metadata will be saved into the database using the `saveDocumentaryMetadata` function.
+
+```js
+await saveDocumentaryMetadata({ video: videoPath, audio: voice, narrative, title })
+```
+
+This function also accesible directly in the `/api/metadata` route using `POST HTTP` method. Another metadata routes are accessible directly using `/api/metadata` route. Please look at the [routes section](#routes) for routes details.
+
+### Get Videos Metadata
+
+To get the video metadata, you can use `GET` method  in the `/api/metadata` to retrieve all saved data and use the `/api/metadata/:docId` to get the specific video metadata.
+
+[screenshot here]
 
 ### Routes
 
+Here are the routes list for the Node.js server in this project:
+
+| HTTP Method | Route                      | Description                                                 | File                |
+|-------------|----------------------------|-------------------------------------------------------------|---------------------|
+| GET         | `/api/metadata`             | Fetch all documentary metadata                               | `metadataRoutes.js` |
+| GET         | `/api/metadata/:docId`      | Fetch metadata for a specific documentary                    | `metadataRoutes.js` |
+| POST        | `/api/metadata`             | Save or update documentary metadata                          | `metadataRoutes.js` |
+| POST        | `/api/upload`               | Upload and process a video file (MP4 format only)            | `uploadRoutes.js`   |
 
 ## User Interface
 

@@ -2,6 +2,7 @@ import express from 'express'
 import {
 	getDocumentaryMetadata,
 	saveDocumentaryMetadata,
+	getAllDocumentaryMetadata
 } from '../services/gridDBService.js'
 
 const router = express.Router()
@@ -29,6 +30,16 @@ router.post('/', async (req, res) => {
 	} catch (error) {
 		console.log(error)
 		res.status(500).json({ message: 'Error saving metadata' })
+	}
+})
+
+router.get('/', async(req, res) => {
+	try {
+		const allData = await getAllDocumentaryMetadata()
+		res.json(allData)
+	} catch(error) {
+		console.log(error)
+		res.status(500).json({ message: 'Error retrieving metadata' })
 	}
 })
 

@@ -6,6 +6,7 @@ import fs from 'fs'
 import { __dirname } from '../dirname.js'
 import { processVideo } from '../libs/videoprocessor.js'
 import { generateNarrative } from '../services/openAIService.js'
+//import { saveDocumentaryMetadata } from '../services/gridDBService.js'
 
 const router = express.Router()
 
@@ -40,20 +41,22 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 	if (!req.file) {
 		return res.status(400).send('No file uploaded or invalid file type.')
 	}
+
 	try {
 		const videoPath = path.join(__dirname, 'uploads', req.file.filename)
 		const { base64Frames } = await processVideo(videoPath)
-
 		// send frames to OpenAI
 		const { narrative, title, voice } = await generateNarrative(base64Frames)
 
-	    // simple debugging
+		// simple debugging
 		console.log(`video: ${videoPath}`)
 		console.log(`narrative: ${narrative}`)
 		console.log(`title: ${title}`)
 		console.log(`voice: ${voice}`)
 
-		// TODO: save metadata to GridDB
+		//await saveDocumentaryMetadata({
+		//	video: videoPath, audio: voice, narrative, title
+		//})
 
 		res.json({
 			message: `File uploaded and processed: ${req.file.filename}`,

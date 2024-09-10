@@ -7,7 +7,6 @@ import { __dirname } from '../dirname.js'
 import { processVideo } from '../libs/videoprocessor.js'
 import { generateNarrative } from '../services/openAIService.js'
 
-
 const router = express.Router()
 
 const storage = multer.diskStorage({
@@ -23,7 +22,6 @@ const storage = multer.diskStorage({
 	}
 })
 
-// File filter to only allow mp4 files
 const fileFilter = (req, file, cb) => {
 	const allowedMimeTypes = ['video/mp4']
 	if (!allowedMimeTypes.includes(file.mimetype)) {
@@ -32,14 +30,12 @@ const fileFilter = (req, file, cb) => {
 	cb(null, true)
 }
 
-// Set file size limit to 100MB and apply file filter
 const upload = multer({
 	storage,
 	limits: { fileSize: 100 * 1024 * 1024 }, // 100MB
 	fileFilter
 })
 
-// Upload route
 router.post('/upload', upload.single('file'), async (req, res) => {
 	if (!req.file) {
 		return res.status(400).send('No file uploaded or invalid file type.')
@@ -50,6 +46,14 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 
 		// send frames to OpenAI
 		const { narrative, title, voice } = await generateNarrative(base64Frames)
+
+	    // simple debugging
+		console.log(`video: ${videoPath}`)
+		console.log(`narrative: ${narrative}`)
+		console.log(`title: ${title}`)
+		console.log(`voice: ${voice}`)
+
+		// TODO: save metadata to GridDB
 
 		res.json({
 			message: `File uploaded and processed: ${req.file.filename}`,

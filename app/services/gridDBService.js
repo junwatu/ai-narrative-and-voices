@@ -1,37 +1,30 @@
-/**
- * Need to be fixed later
- * 
-const griddb = require('griddb-node-sdk');
+import * as GridDB from './libs/griddb.cjs';
+import { generateRandomID } from './libs/rangen.js';
 
-const factory = new griddb.StoreFactory.getInstance();
-const store = factory.getStore({
-	host: "your-host",
-	port: 10001,
-	clusterName: "your-cluster-name",
-	username: "admin",
-	password: "admin"
-});
-*/
+const { collectionDb, store, conInfo } = await GridDB.initGridDbTS();
 
-async function getDocumentaryMetadata(docId) {
-    /**
-		const container = await store.getContainer("documentary_metadata");
-		const query = container.query(`SELECT * WHERE id = '${docId}'`);
-		const rs = await query.fetch();
-		if (rs.hasNext()) {
-			return rs.next();
-		}
-	
-	**/
-	return null
+export async function saveDocumentaryMetadata({ video, audio, narrative, title }) {
+	const id = generateRandomID();
+	const videoFilename = String(video);
+	const audioFilename = String(audio);
+	const videoNarrative = String(narrative);
+	const videoTitle = String(title)
+
+	const packetInfo = [parseInt(id), videoFilename, audioFilename, videoNarrative, videoTitle];
+	const saveStatus = await GridDB.insert(packetInfo, collectionDb);
+	return saveStatus;
 }
 
-async function saveDocumentaryMetadata(metadata) {
-    /**
-	const container = await store.getContainer("documentary_metadata");
-	await container.put(metadata);
-	*/
-	return null
+export async function getDocumentaryMetadata(id) {
+	return await GridDB.queryByID(id, conInfo, store);
 }
 
-export { getDocumentaryMetadata, saveDocumentaryMetadata }
+export async function getAllDocumentaryMetadata() {
+	return await GridDB.queryAll(conInfo, store);
+}
+
+export async function info() {
+	return await GridDB.containersInfo(store);
+}
+
+export { getDocumentaryMetadata, saveDocumentaryMetadata, getAllDocumentaryMetadata }

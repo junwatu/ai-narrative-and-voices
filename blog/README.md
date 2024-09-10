@@ -144,11 +144,14 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 		const { base64Frames } = await processVideo(videoPath)
 
 		// send frames to OpenAI
+        const { narrative, title, voice } = await generateNarrative(base64Frames)
 
 		res.json({
 			message: `File uploaded and processed: ${req.file.filename}`,
-			frames: base64Frames,
-			filename: videoPath
+			filename: videoPath,
+			narrative,
+			title,
+			voice
 		})
 	} catch (error) {
 		console.error('Error processing video:', error)
@@ -192,15 +195,16 @@ The default seconds per frame is 4 seconds. You can override this by passing the
 
 ### AI Content Generation
 
-The routes `/api/generate/narrative` and `/api/generate/title` are used to generate the narrative and title of the video. The `generateNarrative` and `generateTitle` functions are responsible for generating the narrative and title of the video. These functions are defined in the `services/openAIService.js` file.
+The `generateNarrative` is the function that responsible for AI-generated title, narrative, and audio file.
 
 #### Generate Narrative
 
-The `generateNarrative` function is used to generate the narrative of the video. It takes the base64 frames of the video as input and returns the narrative of the video.
+The `generateNarrative` function takes the base64 frames of the video as input and returns the narrative, title, and generated audio voice.
 
 ```js
-async function generateNarrative(frames, videoDuration = 2) {
-) {
+async function generateNarrative(frames) {
+	const videoDuration = 2
+
 	const frameObjects = frames.map(x => ({
 		type: 'image_url',
 		image_url: {
@@ -232,12 +236,22 @@ async function generateNarrative(frames, videoDuration = 2) {
 		frequency_penalty: 0,
 		presence_penalty: 0,
 		response_format: {
-		  "type": "text"
+			"type": "text"
 		},
 	});
 
-	const narrativeResponse = response.choices[0].message.content
-	return narrativeResponse;
+	if (response.choices[0].finish_reason === 'stop') {
+		const narrative = response.choices[0].message.content
+		const title = await generateTitle(narrative)
+		
+		const fileName = title.split(' ').join('-').toLowerCase()
+		const voice = await generateSpeechToFile(narrative, 'audio', fileName)
+
+		return { narrative, title, voice }
+	}
+	else {
+		throw new Error('Failed to generate narrative')
+	}
 }
 ```
 
@@ -247,9 +261,11 @@ To generate the narrative text, we use prompt engineering to guide the AI model.
 The original video, in which frames are generated  is ${videoDuration} seconds. Create a story based on these frames. BE CREATIVE. DIRECT ANSWER ONLY.
 ```
 
+This function also use the `generateTitle` function to generate title and the `generateSpeechToFile` function to generate audio voice.
+
 #### Generate Title
 
-The `generateTitle` function is used to generate the title of the video. It takes the narrative text as input and returns the title.
+The `generateTitle` function takes the narrative text as input and returns the title.
 
 ```js
 async function generateTitle(narrative) {
@@ -280,29 +296,47 @@ async function generateTitle(narrative) {
 }
 ```
 
-The model used here is `gpt-4o-mini` which is a smaller version of `gpt-4o` model.
+The model used here is `gpt-4o-mini` which is a smaller version of `gpt-4o` model and it's very good to generate unique title.
+
+### Audio Voice Generation
+
+The `generateSpeechToFile` function will generate audio voice based on the given text input. We use the `tts-1` AI model, which is a powerfull text to speech model from OpenAI. The generated audio style can be selected from a few prodived sound styles. In this project, we will use `shimmer` voice style.
+
+```js
+async function generateSpeechToFile(text, folderPath, fileName, model = 'tts-1', voice = 'shimmer') {
+	try {
+		if (!fs.existsSync(folderPath)) {
+			await fs.promises.mkdir(folderPath, { recursive: true });
+		}
+
+		const outputFilePath = path.join(folderPath, `${fileName}.mp3`);
+		const mp3 = await openai.audio.speech.create({
+			model,
+			voice,
+			input: text,
+		});
+
+		const buffer = Buffer.from(await mp3.arrayBuffer());
+		await fs.promises.writeFile(outputFilePath, buffer);
+		console.log(`File saved at: ${outputFilePath}`);
+		return outputFilePath;
+	} catch (error) {
+		console.error('Error generating speech:', error);
+		throw error;
+	}
+}
+```
+
+The generated audio will be saved as an MP3 file in the specified folder. This audio file can be combined with the original video footage to create a compelling documentary-style video.
 
 ### Connect to GridDB
-
-### Routes
-
-
-## **AI Content Generation Workflow**
-
-[DRAFT]
-
-
-### **Creating Narrative Descriptions**
-
-Using OpenAI’s `gpt-4o` model to generate impactful and attention-grabbing description and title based on the video’s content.
-
-### **Generating Narrative Voices**
-
-Using OpenAI’s `whisper` model to produce engaging and relevant narrative content.
 
 ### **Storing Video Metadata in GridDB**
 
 How metadata like themes, topics, and timestamps help refine AI output.
+
+### Routes
+
 
 ## User Interface
 

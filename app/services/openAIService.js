@@ -1,5 +1,6 @@
 import OpenAI from 'openai'
 import fs from 'fs'
+import path from 'path'
 
 const openai = new OpenAI({
 	apiKey: process.env.OPENAI_API_KEY,
@@ -32,8 +33,7 @@ async function generateTitle(narrative) {
 	return title
 }
 
-async function generateNarrative(frames) {
-	const videoDuration = 2
+async function generateNarrative(frames, videoDuration = 10) {
 
 	const frameObjects = frames.map(x => ({
 		type: 'image_url',
@@ -46,7 +46,7 @@ async function generateNarrative(frames) {
 	const videoContent = {
 		role: "user",
 		content: [
-			{ type: 'text', text: `The original video, in which frames are generated  is ${videoDuration} seconds. Create a story based on these frames. BE CREATIVE. DIRECT ANSWER ONLY.` },
+			{ type: 'text', text: `The original video, in which frames are generated  is ${videoDuration} seconds. Create a story based on these frames with no longer than ${videoDuration} human voice. BE CREATIVE. DIRECT ANSWER ONLY.` },
 			...frameObjects
 		],
 	}

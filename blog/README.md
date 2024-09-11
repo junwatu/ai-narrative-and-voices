@@ -366,6 +366,6 @@ Here are the routes list for the Node.js server in this project:
 
 [DRAFT] 
 
-## **Repository Link**
+## Repository Link
 
 [Github project source code](https://github.com/junwatu/ai-narrative-and-voices/tree`/main/app)

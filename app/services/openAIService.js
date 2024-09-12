@@ -52,7 +52,7 @@ async function generateNarrative(frames, videoDuration = 10) {
 	}
 
 	const response = await openai.chat.completions.create({
-		model: "gpt-4o",
+		model: "gpt-4o-2024-08-06",
 		messages: [
 			{
 				role: "system",

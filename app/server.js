@@ -1,7 +1,7 @@
 import express from 'express'
 import path from 'path'
 import bodyParser from 'body-parser'
-//import metadataRoutes from './routes/metadataRoutes.js'
+import metadataRoutes from './routes/metadataRoutes.js'
 import uploadRoutes from './routes/uploadRoutes.js'
 import { __dirname } from './dirname.js'
 
@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api', uploadRoutes)
-//app.use('/api/metadata', metadataRoutes)
+app.use('/api/metadata', metadataRoutes)
 
 app.listen(PORT, HOSTNAME, () => {
     console.log(`Server is running on http://${HOSTNAME}:${PORT}`)

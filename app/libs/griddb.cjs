@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-undef
 const griddb = require('griddb-node-api');
-const containerName = 'AIVideoSummarizer';
+const containerName = 'AIVideoNarrative';
 
 const initStore = async () => {
 	const factory = griddb.StoreFactory.getInstance();

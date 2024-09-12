@@ -18,7 +18,8 @@
     "multer": "^1.4.5-lts.1",
     "openai": "^4.56.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "griddb-node-api": "^0.8.6"
   },
   "devDependencies": {
     "@dotenvx/dotenvx": "^1.10.3",

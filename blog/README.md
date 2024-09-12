@@ -399,7 +399,13 @@ This function also accesible directly in the `/api/metadata` route using `POST H
 
 To get the video metadata, you can use `GET` method  in the `/api/metadata` to retrieve all saved data and use the `/api/metadata/:docId` to get the specific video metadata.
 
-[screenshot here]
+![get data from gridb](images/ss-ai-narrative.png)
+
+### Get Video By ID
+
+To get a video metadata based on the ID, you can use the `GET` method in the `/api/metadata/:id` route with `id` is the data identifier as the uery parameter.
+
+![get data using id](images/ss-ai-narrative-get-data-byid.png)
 
 ### Routes
 

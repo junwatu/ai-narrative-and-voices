@@ -386,17 +386,13 @@ The generated audio will be saved as an MP3 file in the specified folder. This a
 
 ### Connect To GridDB
 
-The `griddb.cjs` file is responsible to connect to the GridDB database and the `gridDBService.js` is a wrapper for easy code.
+The `griddb.cjs` file is responsible to connect to the GridDB database and the `gridDBService.js` is a wrapper for easy code. These are the methods we use in this project.
 
-| Function Name               | Description                                                                  |
+| Function Name               | Description                                                           |
 |-----------------------------|------------------------------------------------------------------------------|
 | `saveDocumentaryMetadata`   | Saves documentary metadata (video, audio, narrative, title) to the database. |
 | `getDocumentaryMetadata`    | Retrieves documentary metadata by its ID.                                    |
 | `getAllDocumentaryMetadata` | Retrieves all documentary metadata stored in the database.                   |
-
-#### Dependencies:
-- **GridDB**: Custom library (`griddb.cjs`) providing database functions like `initGridDbTS`, `insert`, and query methods.
-- **rangen.js**: Custom library providing a function to generate random IDs (`generateRandomID`).
 
 ### Storing Video Metadata in GridDB
 

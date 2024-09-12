@@ -43,13 +43,14 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 	}
 
 	try {
-		const videoPath = path.join(__dirname, 'uploads', req.file.filename)
+		// relative path
+		const videoPath = path.join('uploads', req.file.filename)
 		const { base64Frames, duration } = await processVideo(videoPath)
 		// send frames to OpenAI
 		const { narrative, title, voice } = await generateNarrative(base64Frames, duration)
 
 		// simple debugging
-		console.log(`video: ${videoPath}`)
+		console.log(`video: ${req.file.filename}`)
 		console.log(`video duration: ${duration} seconds`)
 		console.log(`narrative: ${narrative}`)
 		console.log(`title: ${title}`)
@@ -60,8 +61,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 		//})
 
 		res.json({
-			message: `File uploaded and processed: ${req.file.filename}`,
-			filename: videoPath,
+			filename: req.file.filename,
 			narrative,
 			title,
 			voice

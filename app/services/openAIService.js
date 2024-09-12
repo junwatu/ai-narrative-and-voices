@@ -46,7 +46,7 @@ async function generateNarrative(frames, videoDuration = 10) {
 	const videoContent = {
 		role: "user",
 		content: [
-			{ type: 'text', text: `The original video, in which frames are generated  is ${videoDuration} seconds. Create a story based on these frames with no longer than ${videoDuration} human voice. BE CREATIVE. DIRECT ANSWER ONLY.` },
+			{ type: 'text', text: `The original video, in which frames are generated  is ${videoDuration} seconds. Create a story based on these frames that fit for exactly ${videoDuration} seconds. BE CREATIVE. DIRECT ANSWER ONLY.` },
 			...frameObjects
 		],
 	}
@@ -98,8 +98,9 @@ async function generateSpeechToFile(text, folderPath, fileName, model = 'tts-1',
 		if (!fs.existsSync(folderPath)) {
 			await fs.promises.mkdir(folderPath, { recursive: true });
 		}
-
-		const outputFilePath = path.join(folderPath, `${fileName}.mp3`);
+        
+		const mp3Filename = `${fileName}.mp3`
+		const outputFilePath = path.join(folderPath, mp3Filename);
 		const mp3 = await openai.audio.speech.create({
 			model,
 			voice,
@@ -109,7 +110,7 @@ async function generateSpeechToFile(text, folderPath, fileName, model = 'tts-1',
 		const buffer = Buffer.from(await mp3.arrayBuffer());
 		await fs.promises.writeFile(outputFilePath, buffer);
 		console.log(`File saved at: ${outputFilePath}`);
-		return outputFilePath;
+		return mp3Filename;
 	} catch (error) {
 		console.error('Error generating speech:', error);
 		throw error;

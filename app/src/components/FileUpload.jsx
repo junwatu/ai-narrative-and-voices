@@ -38,6 +38,10 @@ const FileUpload = () => {
         }
     }
 
+    const getDownloadLink = (filename) => {
+        return `/${filename}`
+    }
+
     return (
         <div className="max-w-xl mx-auto p-4 border border-gray-300 rounded-lg shadow-md bg-white">
             <h2 className="text-xl font-semibold mb-4">File Upload</h2>
@@ -61,6 +65,28 @@ const FileUpload = () => {
                 <div className="mt-4 p-4 border border-gray-200 rounded-md bg-gray-50">
                     <h3 className="text-lg font-semibold mb-2">Upload Data:</h3>
                     <pre className="whitespace-pre-wrap break-words text-sm text-gray-700">{JSON.stringify(uploadData, null, 2)}</pre>
+                    
+                    <div className="mt-4">
+                        <h4 className="text-md font-semibold mb-2">Download Links:</h4>
+                        {uploadData.filename && (
+                            <a 
+                                href={getDownloadLink(uploadData.filename)}
+                                download
+                                className="block mb-2 text-blue-500 hover:underline"
+                            >
+                                Download Video File
+                            </a>
+                        )}
+                        {uploadData.voice && (
+                            <a 
+                                href={getDownloadLink(uploadData.voice)}
+                                download
+                                className="block text-blue-500 hover:underline"
+                            >
+                                Download Voice File
+                            </a>
+                        )}
+                    </div>
                 </div>
             )}
         </div>

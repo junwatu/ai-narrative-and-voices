@@ -17,14 +17,15 @@ const PORT = apiURL.port || 3000
 app.use(bodyParser.json({ limit: '10mb' }))
 app.use(express.static(path.join(__dirname, 'dist')))
 app.use(express.static(path.join(__dirname, 'public')))
-app.use(express.static(path.join(__dirname, 'frames')))
+app.use(express.static(path.join(__dirname, 'audio')))
+app.use(express.static(path.join(__dirname, 'uploads')))
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'))
+})
 
 app.use('/api', uploadRoutes)
 //app.use('/api/metadata', metadataRoutes)
-
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'))
-})
 
 app.listen(PORT, HOSTNAME, () => {
     console.log(`Server is running on http://${HOSTNAME}:${PORT}`)

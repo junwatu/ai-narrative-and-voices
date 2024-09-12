@@ -36,7 +36,6 @@ Creating compelling narratives and attention-grabbing titles for documentary vid
 - **Creative Blocks**: Writers frequently face creative blocks, hindering the consistent generation of fresh, engaging content.
 - **Scalability Issues**: As content volume grows, maintaining consistent quality across multiple projects becomes increasingly difficult.
 
-
 ## **Tech Stack Overview**
 
 ### OpenAI Key
@@ -45,7 +44,7 @@ To access any OpenAI services, we need a valid key. Go to this [link](https://pl
 
 ![setup key](images/openai-key.png)
 
-The OpenAI key is on a project basis, so we need to create a project first in the OpenAI platform and you need also to enable any models that you use on a project. For this project, we will need `gpt-4o`, `gpt-4o-mini` and `tts-1` models.
+The OpenAI key is on a project basis, so we need to create a project first in the OpenAI platform and you need also to enable any models that you use on a project. For this project, we will need `gpt-4o` or `gpt-4o-2024-08-06`, `gpt-4o-mini` and `tts-1` models.
 
 ![enabled models](images/openai-enabled-models.png)
 
@@ -371,12 +370,58 @@ Here are the routes list for the Node.js server in this project:
 
 ## User Interface
 
-[DRAFT]
+![ui sreenshot](images/ui-screenshot.png)
+
+The user interface is built with React.js, providing a modern, component-based architecture. This choice of technology stack enables developers to easily customize and expand the user interface to meet evolving project requirements or incorporate new features in the future.
+
+The main UI is a simple file uploader react component. The component source code is in the `components/FileUpload.jsx` file.
+
+```jsx
+const handleUpload = async () => {
+    if (!file) {
+        setUploadStatus('Please select a file first.')
+        return
+    }
+
+    const formData = new FormData()
+    formData.append('file', file)
+
+    try {
+        setUploadStatus('Uploading...')
+        const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+        })
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok')
+        }
+
+        const data = await response.json()
+        setUploadData(data)
+        setUploadStatus('Upload successful!')
+    } catch (error) {
+        console.error('Error uploading file:', error)
+        setUploadStatus('Error uploading file. Please try again.')
+    }
+}
+```
+
+The `handleUpload` function will upload the file to the `/api/upload` route and will handle the data response for further processing.
 
 ## Demo
 
 [DRAFT] 
 
-## Repository Link
+## Further Enhancements
 
-[Github project source code](https://github.com/junwatu/ai-narrative-and-voices/tree`/main/app)
+These are enhancements recommendations to make this base project better and usable:
+
+- Add video composer function which compose the generated audio and the original video.
+- Add longer video duration upload.
+- Add video user interface to show the final result.
+
+
+## Code Repository Link
+
+[Github](https://github.com/junwatu/ai-narrative-and-voices/tree`/main/app)

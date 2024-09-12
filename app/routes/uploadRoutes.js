@@ -6,7 +6,7 @@ import fs from 'fs'
 import { __dirname } from '../dirname.js'
 import { processVideo } from '../libs/videoprocessor.js'
 import { generateNarrative } from '../services/openAIService.js'
-//import { saveDocumentaryMetadata } from '../services/gridDBService.js'
+import { saveDocumentaryMetadata } from '../services/gridDBService.js'
 
 const router = express.Router()
 
@@ -56,9 +56,9 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 		console.log(`title: ${title}`)
 		console.log(`voice: ${voice}`)
 
-		//await saveDocumentaryMetadata({
-		//	video: videoPath, audio: voice, narrative, title
-		//})
+		await saveDocumentaryMetadata({
+			video: videoPath, audio: voice, narrative, title
+		})
 
 		res.json({
 			filename: req.file.filename,

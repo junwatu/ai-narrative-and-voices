@@ -22,8 +22,10 @@ router.get('/:docId', async (req, res) => {
 	}
 })
 
-// Save or update metadata for a documentary
+// Save or update metadata for a documentary via API
+// for future use
 router.post('/', async (req, res) => {
+	console.log(re.body)
 	try {
 		await saveDocumentaryMetadata(req.body)
 		res.json({ message: 'Metadata saved successfully' })

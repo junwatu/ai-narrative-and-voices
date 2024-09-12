@@ -168,7 +168,7 @@ The node.js server provides routes and exposes dist, public, audio, and uploads 
 The `api/upload` route handles the video upload and saves the video in the `uploads` folder.
 
 ```js
-app.use('/api', uploadRoutes)  // Add the upload routes
+app.use('/api', uploadRoutes)
 ```
 
 The `uploadRoutes` is defined in the `routes/uploadRoutes.js` file.
@@ -186,13 +186,6 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 		// send frames to OpenAI
 		const { narrative, title, voice } = await generateNarrative(base64Frames, duration)
 
-		// simple debugging
-		console.log(`video: ${req.file.filename}`)
-		console.log(`video duration: ${duration} seconds`)
-		console.log(`narrative: ${narrative}`)
-		console.log(`title: ${title}`)
-		console.log(`voice: ${voice}`)
-
 		await saveDocumentaryMetadata({
 		    video: videoPath, audio: voice, narrative, title
 		})
@@ -208,9 +201,9 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 		res.status(500).send('Error processing video')
 	}
 })
-
 ```
-This route is used to process the video and extract the frames and will return the base64 frames of the video and later will be sent to OpenAI for generating the narrative voices and titles.
+
+This route is used to process the video and extract the frames and will return the base64 frames of the video and later will be sent to OpenAI for generating the narrative voices and titles. This route returns JSON data for client-side display.
 
 ### Frame Extraction
 
@@ -436,6 +429,7 @@ Here are the routes list for the Node.js server in this project:
 The user interface is built with React.js, providing a modern, component-based architecture. This choice of technology stack enables developers to easily customize and expand the user interface to meet evolving project requirements or incorporate new features in the future.
 
 The main UI is a simple file uploader react component. The component source code is in the `components/FileUpload.jsx` file.
+The `handleUpload` function will upload the file to the `/api/upload` route and will handle the data response for further processing.
 
 ```jsx
 const handleUpload = async () => {
@@ -467,8 +461,6 @@ const handleUpload = async () => {
     }
 }
 ```
-
-The `handleUpload` function will upload the file to the `/api/upload` route and will handle the data response for further processing.
 
 ## Demo
 

@@ -117,11 +117,12 @@ We will use [React](https://react.dev/) to build the front end of the applicatio
 
 Node.js server is the core of the application. It is responsible for the following tasks:
 
-- Handle the video upload
-- Frame extraction
-- AI content generation
-- Connect to GridDB
-- Routes
+- [Handle the video upload](#video-upload)
+- [Frame extraction](#frame-extraction)
+- [AI content generation](#ai-content-generation)
+- [Audio Voice Generation](#audio-voice-generation)
+- [Storing Data To GridDB](#storing-video-metadata-in-griddb)
+- [Routes](#routes)
 
 The server code is:
 

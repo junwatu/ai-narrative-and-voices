@@ -123,6 +123,45 @@ Node.js server is the core of the application. It is responsible for the followi
 - Connect to GridDB
 - Routes
 
+The server code is:
+
+```js
+import express from 'express'
+import path from 'path'
+import bodyParser from 'body-parser'
+import metadataRoutes from './routes/metadataRoutes.js'
+import uploadRoutes from './routes/uploadRoutes.js'
+import { __dirname } from './dirname.js'
+
+const app = express()
+
+if (!process.env.VITE_APP_URL) {
+    throw new Error('VITE_APP_URL environment variable is not set')
+}
+const apiURL = new URL(process.env.VITE_APP_URL)
+const HOSTNAME = apiURL.hostname || 'localhost'
+const PORT = apiURL.port || 3000
+
+app.use(bodyParser.json({ limit: '10mb' }))
+app.use(express.static(path.join(__dirname, 'dist')))
+app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.static(path.join(__dirname, 'audio')))
+app.use(express.static(path.join(__dirname, 'uploads')))
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'))
+})
+
+app.use('/api', uploadRoutes)
+app.use('/api/metadata', metadataRoutes)
+
+app.listen(PORT, HOSTNAME, () => {
+    console.log(`Server is running on http://${HOSTNAME}:${PORT}`)
+})
+```
+
+Basically the node.js server provides routes and expose dist, public, audio, and uploads directory to the client. The audio and uploads directories are needed so later the client will be able to donwnload the generated audio and original video files.
+
 ### Video Upload
 
 The `api/upload` route handles the video upload and saves the video the `uploads` folder.
@@ -135,34 +174,40 @@ The `uploadRoutes` is defined in the `routes/uploadRoutes.js` file.
 
 ```js
 router.post('/upload', upload.single('file'), async (req, res) => {
-    if (!req.file) {
-        return res.status(400).send('No file uploaded or invalid file type.')
-    }
-    try {
-        const videoPath = path.join(__dirname, 'uploads', req.file.filename)
-        const {
-            base64Frames
-        } = await processVideo(videoPath)
+	if (!req.file) {
+		return res.status(400).send('No file uploaded or invalid file type.')
+	}
 
-        // send frames to OpenAI
-        const {
-            narrative,
-            title,
-            voice
-        } = await generateNarrative(base64Frames)
+	try {
+		// relative path
+		const videoPath = path.join('uploads', req.file.filename)
+		const { base64Frames, duration } = await processVideo(videoPath)
+		// send frames to OpenAI
+		const { narrative, title, voice } = await generateNarrative(base64Frames, duration)
 
-        res.json({
-            message: `File uploaded and processed: ${req.file.filename}`,
-            filename: videoPath,
-            narrative,
-            title,
-            voice
-        })
-    } catch (error) {
-        console.error('Error processing video:', error)
-        res.status(500).send('Error processing video')
-    }
+		// simple debugging
+		console.log(`video: ${req.file.filename}`)
+		console.log(`video duration: ${duration} seconds`)
+		console.log(`narrative: ${narrative}`)
+		console.log(`title: ${title}`)
+		console.log(`voice: ${voice}`)
+
+		await saveDocumentaryMetadata({
+		    video: videoPath, audio: voice, narrative, title
+		})
+
+		res.json({
+			filename: req.file.filename,
+			narrative,
+			title,
+			voice
+		})
+	} catch (error) {
+		console.error('Error processing video:', error)
+		res.status(500).send('Error processing video')
+	}
 })
+
 ```
 This route is used to process the video and extract the frames and will returns the base64 frames of the video and later will be sent to OpenAI for generating the narrative voices and titles.
 
@@ -312,28 +357,27 @@ The `generateSpeechToFile` function will generate audio voice based on the given
 
 ```js
 async function generateSpeechToFile(text, folderPath, fileName, model = 'tts-1', voice = 'shimmer') {
-    try {
-        if (!fs.existsSync(folderPath)) {
-            await fs.promises.mkdir(folderPath, {
-                recursive: true
-            });
-        }
+	try {
+		if (!fs.existsSync(folderPath)) {
+			await fs.promises.mkdir(folderPath, { recursive: true });
+		}
+        
+		const mp3Filename = `${fileName}.mp3`
+		const outputFilePath = path.join(folderPath, mp3Filename);
+		const mp3 = await openai.audio.speech.create({
+			model,
+			voice,
+			input: text,
+		});
 
-        const outputFilePath = path.join(folderPath, `${fileName}.mp3`);
-        const mp3 = await openai.audio.speech.create({
-            model,
-            voice,
-            input: text,
-        });
-
-        const buffer = Buffer.from(await mp3.arrayBuffer());
-        await fs.promises.writeFile(outputFilePath, buffer);
-        console.log(`File saved at: ${outputFilePath}`);
-        return outputFilePath;
-    } catch (error) {
-        console.error('Error generating speech:', error);
-        throw error;
-    }
+		const buffer = Buffer.from(await mp3.arrayBuffer());
+		await fs.promises.writeFile(outputFilePath, buffer);
+		console.log(`File saved at: ${outputFilePath}`);
+		return mp3Filename;
+	} catch (error) {
+		console.error('Error generating speech:', error);
+		throw error;
+	}
 }
 ```
 
@@ -411,13 +455,15 @@ The `handleUpload` function will upload the file to the `/api/upload` route and 
 
 ## Demo
 
-[DRAFT] 
+![demo](images/demo.gif)
+
+Other than the details response data, the user can also download the generated narrative audio and the original video files.
 
 ## Further Enhancements
 
 These are enhancements recommendations to make this base project better and usable:
 
-- Add video composer function which compose the generated audio and the original video.
+- Add video composer function which compose the generated narrative audio and the original video.
 - Add longer video duration upload.
 - Add video user interface to show the final result.
 

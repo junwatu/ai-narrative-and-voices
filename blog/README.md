@@ -4,7 +4,7 @@
 
 ## **Introduction**
 
-This blog focuses on leveraging AI to generate narrative voices and titles for documentary videos. We’ll explore how to implement this using a tech stack that includes Node.js for backend operations, GridDB for managing video metadata, OpenAI for AI-driven text and voice generation, and React for building an interactive frontend.
+This blog focuses on leveraging AI to generate narrative voices and titles for documentary videos. We’ll explore implementing this using a tech stack that includes Node.js for backend operations, GridDB for managing video metadata, OpenAI for AI-driven text and voice generation, and React for building an interactive frontend.
 
 ## Run The Application
 
@@ -17,7 +17,7 @@ cd app
 npm install
 ```
 
-Copy the `.env.example` file to `.env` and set the `VITE_APP_URL` environment variable or leave it by default and set the `OPENAI_API_KEY` environment variable (please look at this section for more details on how to [get the OpenAI API key](#)).
+Copy the `.env.example` file to `.env` and set the `VITE_APP_URL` environment variable or leave it by default and set the `OPENAI_API_KEY` environment variable (please look at this section for more details on how to [get the OpenAI API key](#openai-key)).
 
 To run the application, execute the following command:
 
@@ -26,7 +26,7 @@ npm run start:build
 ```
 Open the browser and navigate to `http://localhost:3000/`. 
 
-> You can also customize the app address and port by setting the `VITE_SITE_URL` environment variable in the `.env` file.
+> You can customize the app address and port by setting the `VITE_SITE_URL` environment variable in the `.env` file.
 
 ## **Solving the Problem**
 
@@ -34,7 +34,7 @@ Creating compelling narratives and attention-grabbing titles for documentary vid
 
 - **Time-Consuming Process**: Manually crafting narratives and titles is lengthy and often leads to delays, particularly under tight production schedules.
 - **Creative Blocks**: Writers frequently face creative blocks, hindering the consistent generation of fresh, engaging content.
-- **Scalability Issues**: As content volume grows, maintaining consistent quality across multiple projects becomes increasingly difficult.
+- **Scalability Issues**: Maintaining consistent quality across multiple projects becomes increasingly difficult as content volume grows.
 
 ## **Tech Stack Overview**
 
@@ -100,7 +100,7 @@ sudo systemctl start gridstore
  
 ### React
 
-We will use [React](https://react.dev/) to build the frontend of the application. React lets you build user interfaces out of individual pieces called components. So if you want to expand or modify the application, you can easily do so by adding or modifying components.
+We will use [React](https://react.dev/) to build the front end of the application. React lets you build user interfaces out of individual pieces called components. So if you want to expand or modify the application, you can easily do so by adding or modifying components.
 
 ## **System Architecture**
 
@@ -160,11 +160,11 @@ app.listen(PORT, HOSTNAME, () => {
 })
 ```
 
-Basically the node.js server provides routes and expose dist, public, audio, and uploads directory to the client. The audio and uploads directories are needed so later the client will be able to donwnload the generated audio and original video files.
+The node.js server provides routes and exposes dist, public, audio, and uploads directories to the client. The audio and upload directories are needed so later the client will be able to download the generated audio and original video files.
 
 ### Video Upload
 
-The `api/upload` route handles the video upload and saves the video the `uploads` folder.
+The `api/upload` route handles the video upload and saves the video in the `uploads` folder.
 
 ```js
 app.use('/api', uploadRoutes)  // Add the upload routes
@@ -209,7 +209,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 })
 
 ```
-This route is used to process the video and extract the frames and will returns the base64 frames of the video and later will be sent to OpenAI for generating the narrative voices and titles.
+This route is used to process the video and extract the frames and will return the base64 frames of the video and later will be sent to OpenAI for generating the narrative voices and titles.
 
 ### Frame Extraction
 
@@ -245,7 +245,7 @@ The default seconds per frame is 4 seconds. You can override this by passing the
 
 ### AI Content Generation
 
-The `generateNarrative` is the function that responsible for AI-generated title, narrative, and audio file.
+The `generateNarrative` is the function responsible for AI-generated titles, narratives, and audio files.
 
 #### Generate Narrative
 
@@ -315,7 +315,7 @@ To generate the narrative text, we use prompt engineering to guide the AI model.
 The original video, in which frames are generated  is ${videoDuration} seconds. Create a story based on these frames. BE CREATIVE. DIRECT ANSWER ONLY.
 ```
 
-This function also use the `generateTitle` function to generate title and the `generateSpeechToFile` function to generate audio voice.
+This function also uses the `generateTitle` function to generate the title and the `generateSpeechToFile` function to generate audio voice.
 
 #### Generate Title
 
@@ -349,11 +349,11 @@ async function generateTitle(narrative) {
 }
 ```
 
-The model used here is `gpt-4o-mini` which is a smaller version of `gpt-4o` model and it's very good to generate unique title.
+The model used here is `gpt-4o-mini` which is a smaller version of the `gpt-4o` model and it's very good to generate a unique title.
 
 ### Audio Voice Generation
 
-The `generateSpeechToFile` function will generate audio voice based on the given text input. We use the `tts-1` AI model, which is a powerfull text to speech model from OpenAI. The generated audio style can be selected from a few prodived sound styles. In this project, we will use `shimmer` voice style.
+The `generateSpeechToFile` function will generate an audio voice based on the given text input. We use the `tts-1` AI model, which is a powerful text-to-speech model from OpenAI. The generated audio style can be selected from a few produced sound styles. In this project, we will use a `shimmer` voice style.
 
 ```js
 async function generateSpeechToFile(text, folderPath, fileName, model = 'tts-1', voice = 'shimmer') {
@@ -387,23 +387,23 @@ The generated audio will be saved as an MP3 file in the specified folder. This a
 
 The GridDB database will store **the video file path**, **audio voice filename**, **generated narrative**, and **title**. This ensures efficient retrieval and management of all essential documentary metadata.
 
-After uploading and processing video by OpenAI. The metadata will be saved into the database using the `saveDocumentaryMetadata` function.
+After uploading and processing the video by OpenAI. The metadata will be saved into the database using the `saveDocumentaryMetadata` function.
 
 ```js
 await saveDocumentaryMetadata({ video: videoPath, audio: voice, narrative, title })
 ```
 
-This function also accesible directly in the `/api/metadata` route using `POST HTTP` method. Another metadata routes are accessible directly using `/api/metadata` route. Please look at the [routes section](#routes) for routes details.
+This function is also accessible directly in the `/api/metadata` route using the `POST HTTP` method. Other metadata routes are accessible directly using the `/api/metadata` route. Please look at the [routes section](#routes) for route details.
 
 ### Get Videos Metadata
 
-To get the video metadata, you can use `GET` method  in the `/api/metadata` to retrieve all saved data and use the `/api/metadata/:docId` to get the specific video metadata.
+To get the video metadata, you can use the `GET` method  in the `/api/metadata` to retrieve all saved data and use the `/api/metadata/:docId` to get the specific video metadata.
 
 ![get data from gridb](images/ss-ai-narrative.png)
 
 ### Get Video By ID
 
-To get a video metadata based on the ID, you can use the `GET` method in the `/api/metadata/:id` route with `id` is the data identifier as the uery parameter.
+To get video metadata based on the ID, you can use the `GET` method in the `/api/metadata/:id` route with `id` as the data identifier as the query parameter.
 
 ![get data using id](images/ss-ai-narrative-get-data-byid.png)
 
@@ -469,10 +469,9 @@ Other than the details response data, the user can also download the generated n
 
 These are enhancements recommendations to make this base project better and usable:
 
-- Add video composer function which compose the generated narrative audio and the original video.
+- Add video composer function which composes the generated narrative audio and the original video.
 - Add longer video duration upload.
-- Add video user interface to show the final result.
-
+- Add a video user interface to show the final result.
 
 ## Code Repository Link
 

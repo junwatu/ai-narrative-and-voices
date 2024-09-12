@@ -268,7 +268,7 @@ async function generateNarrative(frames) {
         role: "user",
         content: [{
                 type: 'text',
-                text: `The original video, in which frames are generated  is ${videoDuration} seconds. Create a story based on these frames. BE CREATIVE. DIRECT ANSWER ONLY.`
+                text: `The original video, in which frames are generated  is ${videoDuration} seconds. Create a story based on these frames that fit for exactly ${videoDuration} seconds. BE CREATIVE. DIRECT ANSWER ONLY.`
             },
             ...frameObjects
         ],
@@ -313,7 +313,7 @@ async function generateNarrative(frames) {
 To generate the narrative text, we use prompt engineering to guide the AI model. The prompt is a text that includes the video frames and the video duration:
 
 ```text
-The original video, in which frames are generated  is ${videoDuration} seconds. Create a story based on these frames. BE CREATIVE. DIRECT ANSWER ONLY.
+The original video, in which frames are generated  is ${videoDuration} seconds. Create a story based on these frames that fit for exactly ${videoDuration} seconds. BE CREATIVE. DIRECT ANSWER ONLY.
 ```
 
 This function also uses the `generateTitle` function to generate the title and the `generateSpeechToFile` function to generate audio voice.
@@ -383,6 +383,20 @@ async function generateSpeechToFile(text, folderPath, fileName, model = 'tts-1',
 ```
 
 The generated audio will be saved as an MP3 file in the specified folder. This audio file can be combined with the original video footage to create a compelling documentary-style video.
+
+### Connect To GridDB
+
+The `griddb.cjs` file is responsible to connect to the GridDB database and the `gridDBService.js` is a wrapper for easy code.
+
+| Function Name               | Description                                                                  |
+|-----------------------------|------------------------------------------------------------------------------|
+| `saveDocumentaryMetadata`   | Saves documentary metadata (video, audio, narrative, title) to the database. |
+| `getDocumentaryMetadata`    | Retrieves documentary metadata by its ID.                                    |
+| `getAllDocumentaryMetadata` | Retrieves all documentary metadata stored in the database.                   |
+
+#### Dependencies:
+- **GridDB**: Custom library (`griddb.cjs`) providing database functions like `initGridDbTS`, `insert`, and query methods.
+- **rangen.js**: Custom library providing a function to generate random IDs (`generateRandomID`).
 
 ### Storing Video Metadata in GridDB
 

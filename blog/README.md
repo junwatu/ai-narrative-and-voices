@@ -136,27 +136,33 @@ The `uploadRoutes` is defined in the `routes/uploadRoutes.js` file.
 
 ```js
 router.post('/upload', upload.single('file'), async (req, res) => {
-	if (!req.file) {
-		return res.status(400).send('No file uploaded or invalid file type.')
-	}
-	try {
-		const videoPath = path.join(__dirname, 'uploads', req.file.filename)
-		const { base64Frames } = await processVideo(videoPath)
+    if (!req.file) {
+        return res.status(400).send('No file uploaded or invalid file type.')
+    }
+    try {
+        const videoPath = path.join(__dirname, 'uploads', req.file.filename)
+        const {
+            base64Frames
+        } = await processVideo(videoPath)
 
-		// send frames to OpenAI
-        const { narrative, title, voice } = await generateNarrative(base64Frames)
+        // send frames to OpenAI
+        const {
+            narrative,
+            title,
+            voice
+        } = await generateNarrative(base64Frames)
 
-		res.json({
-			message: `File uploaded and processed: ${req.file.filename}`,
-			filename: videoPath,
-			narrative,
-			title,
-			voice
-		})
-	} catch (error) {
-		console.error('Error processing video:', error)
-		res.status(500).send('Error processing video')
-	}
+        res.json({
+            message: `File uploaded and processed: ${req.file.filename}`,
+            filename: videoPath,
+            narrative,
+            title,
+            voice
+        })
+    } catch (error) {
+        console.error('Error processing video:', error)
+        res.status(500).send('Error processing video')
+    }
 })
 ```
 This route is used to process the video and extract the frames and will returns the base64 frames of the video and later will be sent to OpenAI for generating the narrative voices and titles.
@@ -167,27 +173,27 @@ The `processVideo` function is defined in the `libs/videoprocessor.js` file. Thi
 
 ```js
 export function extractFrames(videoPath, secondsPerFrame, outputFolder, scaleFactor = 0.5) {
-	return new Promise((resolve, reject) => {
-		const frameRate = 1 / secondsPerFrame
-		const framePattern = path.join(outputFolder, 'frame-%03d.png')
-		const resizeOptions = `fps=${frameRate},scale=iw*${scaleFactor}:ih*${scaleFactor}`
+    return new Promise((resolve, reject) => {
+        const frameRate = 1 / secondsPerFrame
+        const framePattern = path.join(outputFolder, 'frame-%03d.png')
+        const resizeOptions = `fps=${frameRate},scale=iw*${scaleFactor}:ih*${scaleFactor}`
 
-		ffmpeg(videoPath)
-			.outputOptions([`-vf ${resizeOptions}`])
-			.output(framePattern)
-			.on('end', () => {
-				fs.readdir(outputFolder, (err, files) => {
-					if (err) {
-						reject(err)
-					} else {
-						const framePaths = files.map(file => path.join(outputFolder, file))
-						resolve(framePaths)
-					}
-				})
-			})
-			.on('error', reject)
-			.run()
-	})
+        ffmpeg(videoPath)
+            .outputOptions([`-vf ${resizeOptions}`])
+            .output(framePattern)
+            .on('end', () => {
+                fs.readdir(outputFolder, (err, files) => {
+                    if (err) {
+                        reject(err)
+                    } else {
+                        const framePaths = files.map(file => path.join(outputFolder, file))
+                        resolve(framePaths)
+                    }
+                })
+            })
+            .on('error', reject)
+            .run()
+    })
 }
 ```
 
@@ -203,55 +209,59 @@ The `generateNarrative` function takes the base64 frames of the video as input a
 
 ```js
 async function generateNarrative(frames) {
-	const videoDuration = 2
+    const videoDuration = 2
 
-	const frameObjects = frames.map(x => ({
-		type: 'image_url',
-		image_url: {
-			url: `data:image/png;base64,${x}`,
-			detail: "low"
-		}
-	}));
+    const frameObjects = frames.map(x => ({
+        type: 'image_url',
+        image_url: {
+            url: `data:image/png;base64,${x}`,
+            detail: "low"
+        }
+    }));
 
-	const videoContent = {
-		role: "user",
-		content: [
-			{ type: 'text', text: `The original video, in which frames are generated  is ${videoDuration} seconds. Create a story based on these frames. BE CREATIVE. DIRECT ANSWER ONLY.` },
-			...frameObjects
-		],
-	}
+    const videoContent = {
+        role: "user",
+        content: [{
+                type: 'text',
+                text: `The original video, in which frames are generated  is ${videoDuration} seconds. Create a story based on these frames. BE CREATIVE. DIRECT ANSWER ONLY.`
+            },
+            ...frameObjects
+        ],
+    }
 
-	const response = await openai.chat.completions.create({
-		model: "gpt-4o",
-		messages: [
-			{
-				role: "system",
-				content: "You are a professional storyteller."
-			},
-			videoContent
-		],
-		temperature: 1,
-		max_tokens: 4095,
-		top_p: 1,
-		frequency_penalty: 0,
-		presence_penalty: 0,
-		response_format: {
-			"type": "text"
-		},
-	});
+    const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{
+                role: "system",
+                content: "You are a professional storyteller."
+            },
+            videoContent
+        ],
+        temperature: 1,
+        max_tokens: 4095,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0,
+        response_format: {
+            "type": "text"
+        },
+    });
 
-	if (response.choices[0].finish_reason === 'stop') {
-		const narrative = response.choices[0].message.content
-		const title = await generateTitle(narrative)
-		
-		const fileName = title.split(' ').join('-').toLowerCase()
-		const voice = await generateSpeechToFile(narrative, 'audio', fileName)
+    if (response.choices[0].finish_reason === 'stop') {
+        const narrative = response.choices[0].message.content
+        const title = await generateTitle(narrative)
 
-		return { narrative, title, voice }
-	}
-	else {
-		throw new Error('Failed to generate narrative')
-	}
+        const fileName = title.split(' ').join('-').toLowerCase()
+        const voice = await generateSpeechToFile(narrative, 'audio', fileName)
+
+        return {
+            narrative,
+            title,
+            voice
+        }
+    } else {
+        throw new Error('Failed to generate narrative')
+    }
 }
 ```
 
@@ -269,30 +279,29 @@ The `generateTitle` function takes the narrative text as input and returns the t
 
 ```js
 async function generateTitle(narrative) {
-	const titleResponse = await openai.chat.completions.create({
-		model: 'gpt-4o-mini',
-		messages: [
-			{
-				role: 'system',
-				content: 'You are a professional storyteller.'
-			},
-			{
-				role: 'user',
-				content: `Direct answer only. Generate a title for the following narrative text: \n${narrative}`
-			}
-		],
-		temperature: 1,
-		max_tokens: 1000,
-		top_p: 1,
-		frequency_penalty: 0,
-		presence_penalty: 0,
-		response_format: {
-			type: 'text'
-		}
-	})
+    const titleResponse = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [{
+                role: 'system',
+                content: 'You are a professional storyteller.'
+            },
+            {
+                role: 'user',
+                content: `Direct answer only. Generate a title for the following narrative text: \n${narrative}`
+            }
+        ],
+        temperature: 1,
+        max_tokens: 1000,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0,
+        response_format: {
+            type: 'text'
+        }
+    })
 
-	const title = titleResponse.choices[0].message.content
-	return title
+    const title = titleResponse.choices[0].message.content
+    return title
 }
 ```
 
@@ -304,26 +313,28 @@ The `generateSpeechToFile` function will generate audio voice based on the given
 
 ```js
 async function generateSpeechToFile(text, folderPath, fileName, model = 'tts-1', voice = 'shimmer') {
-	try {
-		if (!fs.existsSync(folderPath)) {
-			await fs.promises.mkdir(folderPath, { recursive: true });
-		}
+    try {
+        if (!fs.existsSync(folderPath)) {
+            await fs.promises.mkdir(folderPath, {
+                recursive: true
+            });
+        }
 
-		const outputFilePath = path.join(folderPath, `${fileName}.mp3`);
-		const mp3 = await openai.audio.speech.create({
-			model,
-			voice,
-			input: text,
-		});
+        const outputFilePath = path.join(folderPath, `${fileName}.mp3`);
+        const mp3 = await openai.audio.speech.create({
+            model,
+            voice,
+            input: text,
+        });
 
-		const buffer = Buffer.from(await mp3.arrayBuffer());
-		await fs.promises.writeFile(outputFilePath, buffer);
-		console.log(`File saved at: ${outputFilePath}`);
-		return outputFilePath;
-	} catch (error) {
-		console.error('Error generating speech:', error);
-		throw error;
-	}
+        const buffer = Buffer.from(await mp3.arrayBuffer());
+        await fs.promises.writeFile(outputFilePath, buffer);
+        console.log(`File saved at: ${outputFilePath}`);
+        return outputFilePath;
+    } catch (error) {
+        console.error('Error generating speech:', error);
+        throw error;
+    }
 }
 ```
 
